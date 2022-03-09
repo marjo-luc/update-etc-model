@@ -1,0 +1,29 @@
+{
+    "label" : "Estimated Time to Completion Model Update",
+    "allowed_accounts": [ "ops" ],
+    "submission_type":"individual",
+    "params" : [
+      {
+          "name": "model_url",
+          "from": "value",
+          "value": "--model_url"
+      },
+      {
+          "name": "version",
+          "from": "submitter"
+      },
+      {
+          "name": "tag_opt",
+          "from": "value",
+          "value": "--tag"
+      },
+      {
+          "name": "tag",
+          "from": "submitter"
+      },
+      {
+          "name": "es_dataset_url",
+          "from": "submitter"
+      }
+    ]
+  }
