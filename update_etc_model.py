@@ -16,8 +16,7 @@ from requests.packages.urllib3.exceptions import (InsecureRequestWarning,
 try: from html.parser import HTMLParser
 except: from html.parser import HTMLParser
 
-# from osaka.main import get, rmall
-# from sdswatch.logger import SDSWatchLogger
+from osaka.main import get, rmall
 
 
 # disable warnings for SSL verification
@@ -25,25 +24,38 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
 
 
-# set logger
-log_format = "[%(asctime)s: %(levelname)s/%(funcName)s] %(message)s"
-logging.basicConfig(format=log_format, level=logging.INFO)
+# Set up SDSWatch Logger for fulldict
+host = "factotum"
+source_type = "performance_estimator"
+source_id = "pge"
 
-# sdsw_logger = SDSWatchLogger(file_dir="./", 
-#                         name="orbit_crawler", 
-#                         source_type="orbit_scraper", 
-#                         source_id="orbit_crawl")
-#
-# sdsw_logger.log(step=1, pge=crawl_orbits, test=test)
+log_format = ("\'%(asctime)s.%(msecs)03d\',"
+                      "\'" + host + "\',"
+                      "\'" + source_type + "\',"
+                      "\'" + source_id + "\',"
+                      "%(params)s")
+datefmt = '%Y-%m-%d %H:%M:%S'
+formatter = logging.Formatter(log_format, datefmt=datefmt)
+level = logging.INFO
+
+sdswatch_handler = logging.FileHandler(filename = 'performance_estimator.fulldict.sdswatch.log')
+sdswatch_handler.setLevel(level)
+sdswatch_handler.setFormatter(formatter)
+
+logger = logging.getLogger("sdswatch")
+logger.setLevel(level)
+logger.addHandler(sdswatch_handler)
+logging.Formatter.converter = time.gmtime
+
 
 class LogFilter(logging.Filter):
     def filter(self, record):
         if not hasattr(record, 'id'): record.id = '--'
         return True
 
-logger = logging.getLogger('performance_estimator.sdswatch.log')
-logger.setLevel(logging.INFO)
-logger.addFilter(LogFilter())
+# logger = logging.getLogger('performance_estimator.sdswatch.log')
+# logger.setLevel(logging.INFO)
+# logger.addFilter(LogFilter())
 
 
 def cmdLineParse():
@@ -60,6 +72,7 @@ def update(host, model_url):
     url = host + '/update'
     print(url)
     r = requests.get(url)
+    sdsw_logger.log(status_code=r.status_code)
     print(r)
     return 0
 
